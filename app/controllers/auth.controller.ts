@@ -12,13 +12,13 @@ export default class AuthController {
 
   async register({ request, response }: HttpContext) {
     try {
-      console.log('teste')
       const user = await this.authService.register(request.body() as any)
       const token = createToken(user as IUser)
       response.header('Authorization', `Bearer ${token}`)
       return response.status(200).json({ ...user, token })
-    } catch (err) {
-      response.json(err)
+    } catch (err:any) {
+      //TODO: criar interface para erros
+      response.status(err?.status).json(err.messages)
     }
   }
 

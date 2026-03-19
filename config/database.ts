@@ -1,6 +1,7 @@
 import env from '#start/env'
 import { defineConfig } from '@adonisjs/lucid'
 
+
 const dbConfig = defineConfig({
   connection: 'postgres',
   connections: {

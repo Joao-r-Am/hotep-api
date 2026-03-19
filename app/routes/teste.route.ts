@@ -1,4 +1,3 @@
-import AuthMiddleware from '#middleware/auth_middleware'
 import router from '@adonisjs/core/services/router'
 
 const teste = () => {
