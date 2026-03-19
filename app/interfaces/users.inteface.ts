@@ -1,8 +1,7 @@
-import { UUID } from 'crypto'
 import { DateTime } from 'luxon'
 
 export interface IUser {
-  id: UUID
+  id: string
   name: string
   cnpjf: string
   password: string
@@ -23,6 +22,7 @@ export interface IUser {
 }
 
 export enum AccessType {
+  ROOT=0,
   ADMIN = 1,
   BASIC = 2,
   GUEST = 3,
