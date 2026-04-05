@@ -5,7 +5,6 @@ import createToken from '../utils/create-token.js'
 import { IUser } from '../interfaces/users.inteface.js'
 import Ujwt from '../utils/jwt.js'
 
-
 @inject()
 export default class AuthController {
   constructor(private authService: AuthService) {}
@@ -16,9 +15,9 @@ export default class AuthController {
       const token = createToken(user as IUser)
       response.header('Authorization', `Bearer ${token}`)
       return response.status(200).json({ ...user, token })
-    } catch (err:any) {
+    } catch (err: any) {
       //TODO: criar interface para erros
-      response.status(err?.status).json(err.messages)
+      response.status(err?.status).json(err.messages ?? err.messages)
     }
   }
 
@@ -29,8 +28,17 @@ export default class AuthController {
       const token = Ujwt.generateToken(user as IUser)
       response.safeHeader('Authorization', `Bearer ${token}`)
       return response.status(200).json({ ...user, token })
-    } catch (err) {
-      response.json(err)
+    } catch (err: any) {
+      response.status(err?.status).json(err.message ?? err.messages)
+    }
+  }
+
+  async confirmEmail({ request, response }: HttpContext) {
+    try {
+      await this.authService.confirmEmail(request.body().code as any)
+      return response.status(201).json({ message: 'Email confirmado com sucesso' })
+    } catch (err: any) {
+      response.status(err?.status ?? 500).json(err.message ?? err.messages)
     }
   }
 }

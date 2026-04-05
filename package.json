@@ -6,6 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "node bin/server.js",
+    "db:add": "node ace make:model",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
@@ -63,7 +64,8 @@
     "jsonwebtoken": "^9.0.3",
     "luxon": "^3.7.2",
     "pg": "^8.18.0",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "verifalia": "^5.0.0"
   },
   "hotHook": {
     "boundaries": [

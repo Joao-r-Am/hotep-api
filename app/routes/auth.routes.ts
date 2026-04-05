@@ -5,6 +5,7 @@ const authRoutes = () => {
   router.group(() => {
     router.post('login', [AuthController, 'login'])
     router.post('register', [AuthController, 'register'])
+    router.post('confirm-email', [AuthController, 'confirmEmail'])
   }).prefix('auth')
 }
 

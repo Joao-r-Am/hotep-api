@@ -4,14 +4,14 @@ import { compose } from '@adonisjs/core/helpers'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import type { UUID } from 'crypto'
-import { AccessType, EspecialtyArea } from '../interfaces/users.inteface.js'
+import { AccessType, EspecialtyArea, IUser } from '../interfaces/users.inteface.js'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email', 'cnpjf'],
   passwordColumnName: 'password',
 })
 
-export default class User extends compose(BaseModel, AuthFinder) {
+export default class User extends compose(BaseModel, AuthFinder) implements IUser{
   @column({ isPrimary: true })
   declare id: UUID
 
