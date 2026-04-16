@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@adonisjs/lucid/orm'
-import { ICode } from '../interfaces/users.inteface.js'
+import { ICode } from '../interfaces/code.interface.js'
 import type { UUID } from 'crypto'
 
 export default class Code extends BaseModel implements ICode {
@@ -17,7 +17,7 @@ export default class Code extends BaseModel implements ICode {
   declare expires_at: DateTime
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   save(): Promise<this> {
     this.expires_at = DateTime.now().plus({ hours: 1 })
