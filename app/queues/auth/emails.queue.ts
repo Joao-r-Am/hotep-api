@@ -1,17 +1,22 @@
 import mail from '@adonisjs/mail/services/main'
 import { Queue, QueueEvents, Worker } from 'bullmq'
 import { randomUUID } from 'crypto'
-import IORedis, { Redis } from 'ioredis'
+import { Redis } from 'ioredis'
+import fs from 'fs'
+import edge from 'edge.js'
+import { VerifaliaRestClient } from 'verifalia'
+import generateCode from '../../utils/generate-code.js'
+import { IUser } from '../../interfaces/users.inteface.js'
 
 const QUEUE_NAME = 'confirmation'
 
 const connection = new Redis({
-  maxRetriesPerRequest: null
+  maxRetriesPerRequest: null,
 })
 const my_queue = new Queue(QUEUE_NAME, { connection })
 const queue_events = new QueueEvents(QUEUE_NAME, { connection })
 
-async function addJobs(data?: any) {
+async function addJobs(data?: {user_data: IUser, code: string}) {
   await my_queue.add(QUEUE_NAME, data)
 }
 
@@ -32,7 +37,7 @@ const queue = async (payload: any) => {
     },
   })
 
-  queue_events.on('duplicated', async ({jobId}: { jobId: string }) => {
+  queue_events.on('duplicated', async ({ jobId }: { jobId: string }) => {
     console.log('Job duplicated -> ', jobId)
   })
 }
@@ -40,16 +45,20 @@ const queue = async (payload: any) => {
 const worker = new Worker(
   QUEUE_NAME,
   async (job) => {
-  console.log('executing job -> ', job.id)
-    const { name, email } = job.data
-    const send = await mail.send((msg) => {
-      msg
-        .to(email)
-        .from('joaoric.amorim@gmail.com')
-        .subject('Confirmação de cadastro')
-        .htmlView('templates/emails/confirmation', { name: name })
-    })
-  console.log('finished job -> ', job.id)
+    try {
+      const { user_data, code } = job.data
+
+      const buffer = fs.readFileSync('./assets/medkit-logo.png')
+      const photo = `data:image/png;base64,${buffer.toString('base64')}`
+
+      const html= await edge.render('templates/emails/confirmation', { name: user_data.name, photo, code })
+
+      return await mail.send((msg) => {
+        msg.to(user_data.email).from('joaoric.amorim@gmail.com').subject('Confirmação de cadastro').html(html)
+      })
+    } catch (err) {
+      throw err
+    }
   },
   { connection }
 )
@@ -59,7 +68,7 @@ await addJobs()
 const emailsQueue = {
   queue,
   worker,
-  addJobs
+  addJobs,
 }
 
 export default emailsQueue

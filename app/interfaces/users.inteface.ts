@@ -21,6 +21,14 @@ export interface IUser {
   updatedAt: DateTime | null
 }
 
+export interface ICode {
+  id: string
+  code:string
+  user_id: string
+  createdAt: DateTime
+  expires_at: DateTime
+}
+
 export enum AccessType {
   ROOT=0,
   ADMIN = 1,
