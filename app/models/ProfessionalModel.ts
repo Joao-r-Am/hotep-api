@@ -1,7 +1,12 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import type { UUID } from 'crypto'
 import { IProfessional } from '../interfaces/professional.interface.js'
+import Appointment from './AppointmentModel.js'
+import Exam from './ExamModel.js'
+import Procedure from './ProcedureModel.js'
+import ScheduleSlot from './ScheduleSlotModel.js'
 
 export default class Professional extends BaseModel implements IProfessional {
   @column({ isPrimary: true })
@@ -36,4 +41,20 @@ export default class Professional extends BaseModel implements IProfessional {
 
   @column.dateTime()
   declare deleted_at: DateTime | undefined
+
+  @hasMany(() => Appointment)
+  declare appointments: HasMany<typeof Appointment>
+
+  @hasMany(() => ScheduleSlot)
+  declare scheduleSlots: HasMany<typeof ScheduleSlot>
+
+  @manyToMany(() => Exam, {
+    pivotTable: 'professional_exam',
+  })
+  declare exams: ManyToMany<typeof Exam>
+
+  @manyToMany(() => Procedure, {
+    pivotTable: 'professional_procedure',
+  })
+  declare procedures: ManyToMany<typeof Procedure>
 }

@@ -1,9 +1,10 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import type { UUID } from 'crypto'
 import { IScheduleSlot } from '../interfaces/schedule-slot.interface.js'
 import Professional from './ProfessionalModel.js'
+import Appointment from './AppointmentModel.js'
 
 export default class ScheduleSlot extends BaseModel implements IScheduleSlot {
   @column({ isPrimary: true })
@@ -32,4 +33,7 @@ export default class ScheduleSlot extends BaseModel implements IScheduleSlot {
 
   @belongsTo(() => Professional)
   declare professional: BelongsTo<typeof Professional>
+
+  @hasMany(() => Appointment)
+  declare appointments: HasMany<typeof Appointment>
 }

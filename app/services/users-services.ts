@@ -8,11 +8,6 @@ import { DateTime } from 'luxon'
 
 @inject()
 export default class AuthService {
-  constructor(
-    private userModel: User,
-    private codeModel: Code
-  ) {}
-
   async register(
     user: Pick<
       IUser,
@@ -33,7 +28,7 @@ export default class AuthService {
   async login(auth: { identificator: string; password: string }) {
     const { identificator, password } = auth
     const user = await User.verifyCredentials(identificator, password)
-    return user
+    return { token: user.$attributes.token }
   }
 
   async generateCode(user_id: string) {

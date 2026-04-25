@@ -25,7 +25,7 @@ export default class AuthController {
     try {
       const { identificator, password } = request.body() as any
       const user = await this.authService.login({ identificator, password })
-      const token = Ujwt.generateToken(user as IUser)
+      const token = Ujwt.generateToken(user as unknown as IUser)
       response.safeHeader('Authorization', `Bearer ${token}`)
       return response.status(200).json({ ...user, token })
     } catch (err: any) {

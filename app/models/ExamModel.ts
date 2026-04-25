@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import type { UUID } from 'crypto'
 import { IExam } from '../interfaces/exam.interface.js'
+import Appointment from './AppointmentModel.js'
+import Professional from './ProfessionalModel.js'
 
 export default class Exam extends BaseModel implements IExam {
   @column({ isPrimary: true })
@@ -39,4 +42,12 @@ export default class Exam extends BaseModel implements IExam {
 
   @column.dateTime()
   declare deleted_at: DateTime | undefined
+
+  @hasMany(() => Appointment)
+  declare appointments: HasMany<typeof Appointment>
+
+  @manyToMany(() => Professional, {
+    pivotTable: 'professional_exam',
+  })
+  declare professionals: ManyToMany<typeof Professional>
 }

@@ -1,9 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import type { HasMany } from '@adonisjs/lucid/types/relations'
 import type { UUID } from 'crypto'
 import { IPatient } from '../interfaces/patient.interface.js'
+import Appointment from './AppointmentModel.js'
 
-export default class Patient extends BaseModel implements IPatient {
+export default class Patient extends BaseModel implements Exclude<IPatient, 'id'> {
   @column({ isPrimary: true })
   declare id: UUID
 
@@ -33,4 +35,7 @@ export default class Patient extends BaseModel implements IPatient {
 
   @column.dateTime()
   declare deleted_at: DateTime | undefined
+
+  @hasMany(() => Appointment)
+  declare appointments: HasMany<typeof Appointment>
 }

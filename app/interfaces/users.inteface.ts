@@ -23,18 +23,18 @@ export interface IUser {
 
 export interface ICode {
   id: string
-  code:string
+  code: string
   user_id: string
   createdAt: DateTime
   expires_at: DateTime
 }
 
 export enum AccessType {
-  ROOT=0,
+  ROOT = 0,
   ADMIN = 1,
   BASIC = 2,
   GUEST = 3,
-  PREMIUM = 4
+  PREMIUM = 4,
 }
 
 export enum EspecialtyArea {
@@ -45,5 +45,6 @@ export enum EspecialtyArea {
   DENTIST = 'dentist',
   PHARMACIST = 'pharmacist',
   NURSE = 'nurse',
-  OCCUPATIONAL_THERAPIST = 'occupational_therapist'
+  OCCUPATIONAL_THERAPIST = 'occupational_therapist',
+  CLINIC = 'clinic',
 }

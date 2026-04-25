@@ -6,6 +6,8 @@ import Exam from './ExamModel.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export default class ProfessionalExam extends BaseModel implements IProfessionalExam {
+  public static table = 'professional_exam'
+
   @column({ isPrimary: true })
   declare professional_id: UUID
 

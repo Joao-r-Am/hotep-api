@@ -4,8 +4,6 @@ import { randomUUID } from 'crypto'
 import { Redis } from 'ioredis'
 import fs from 'fs'
 import edge from 'edge.js'
-import { VerifaliaRestClient } from 'verifalia'
-import generateCode from '../../utils/generate-code.js'
 import { IUser } from '../../interfaces/users.inteface.js'
 
 const QUEUE_NAME = 'confirmation'
