@@ -1,13 +1,25 @@
-import router from "@adonisjs/core/services/router";
-import authRoutes from "./auth.routes.js";
-import teste from "./teste.route.js";
-
+import router from '@adonisjs/core/services/router'
+import authRoutes from './auth.routes.js'
+import teste from './teste.route.js'
+import patientsRoutes from './patients.route.js'
+import professionalsRoutes from './professionals.route.js'
+import proceduresRoutes from './procedures.route.js'
+import examsRoutes from './exams.route.js'
+import scheduleSlotsRoutes from './schedule-slots.route.js'
+import appointmentsRoutes from './appointments.route.js'
 
 const routes = () =>
-  router.group(() => {
-    authRoutes(),
-    teste()
-  }).prefix('api/v1')
-
+  router
+    .group(() => {
+      authRoutes()
+      patientsRoutes()
+      professionalsRoutes()
+      proceduresRoutes()
+      examsRoutes()
+      scheduleSlotsRoutes()
+      appointmentsRoutes()
+      teste()
+    })
+    .prefix('api/v1')
 
 export default routes

@@ -1,7 +1,8 @@
+import { UUID } from 'crypto'
 import { DateTime } from 'luxon'
 
 export interface IPatient {
-  id: string
+  id: UUID
   name: string
   document: string
   birth_date?: DateTime

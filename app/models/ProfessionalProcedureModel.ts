@@ -6,6 +6,8 @@ import Procedure from './ProcedureModel.js'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export default class ProfessionalProcedure extends BaseModel implements IProfessionalProcedure {
+  public static table = 'professional_procedure'
+
   @column({ isPrimary: true })
   declare professional_id: UUID
 
