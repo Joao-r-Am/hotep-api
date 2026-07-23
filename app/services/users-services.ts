@@ -27,8 +27,17 @@ export default class AuthService {
 
   async login(auth: { identificator: string; password: string }) {
     const { identificator, password } = auth
-    const user = await User.verifyCredentials(identificator, password)
-    return { token: user.$attributes.token }
+    return User.verifyCredentials(identificator, password)
+  }
+
+  async findById(id: string) {
+    const user = await User.find(id)
+
+    if (!user) {
+      throw { message: 'User not found', status: 404 }
+    }
+    //TODO: limimtar dados a retornar
+    return user
   }
 
   async generateCode(user_id: string) {

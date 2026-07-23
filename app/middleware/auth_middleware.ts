@@ -5,11 +5,30 @@ import Ujwt from '../utils/jwt.js'
 
 export default class AuthMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
+    const prefix = '/api/v1'
+    const publicRoutes = new Set([
+      prefix + '/auth/login',
+      prefix + '/auth/register',
+      prefix + '/auth/confirm-email',
+    ])
+
+    function normalizePath(url: string) {
+      const [path] = url.split('?')
+      const normalized = path.replace(/\/+$/, '')
+      return normalized || '/'
+    }
+
+    function isPublicRoute(path: string) {
+      return publicRoutes.has(path)
+    }
+
     try {
-      const url = ctx.request.url()
-      if(url.includes('/auth')) {
+      const path = normalizePath(ctx.request.url())
+
+      if (isPublicRoute(path)) {
         return await next()
       }
+
       const authHeader = ctx.request.header('authorization')
 
       if (!authHeader) {
@@ -32,7 +51,7 @@ export default class AuthMiddleware {
 
       const decoded = Ujwt.verifyToken(token) as JwtPayload
 
-      (ctx as any).auth = {
+      ;(ctx as any).auth = {
         user: decoded,
         isAuthenticated: true,
       }

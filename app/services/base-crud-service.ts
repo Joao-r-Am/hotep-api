@@ -110,7 +110,10 @@ export default class BaseCrudService {
     return record
   }
 
-  private async validatePayload(validator: CompiledValidator | undefined, payload: Record<string, unknown>) {
+  private async validatePayload(
+    validator: CompiledValidator | undefined,
+    payload: Record<string, unknown>
+  ) {
     if (!validator) {
       return payload
     }

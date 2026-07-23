@@ -33,8 +33,7 @@ export enum AccessType {
   ROOT = 0,
   ADMIN = 1,
   BASIC = 2,
-  GUEST = 3,
-  PREMIUM = 4,
+  USER = 3,
 }
 
 export enum EspecialtyArea {
