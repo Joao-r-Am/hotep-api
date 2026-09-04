@@ -14,9 +14,13 @@ export default class ProfessionalExam extends BaseModel implements IProfessional
   @column({ isPrimary: true })
   declare exam_id: UUID
 
-  @belongsTo(() => Professional)
+  @belongsTo(() => Professional, {
+    foreignKey: 'professional_id',
+  })
   declare professional: BelongsTo<typeof Professional>
 
-  @belongsTo(() => Exam)
+  @belongsTo(() => Exam, {
+    foreignKey: 'exam_id',
+  })
   declare exam: BelongsTo<typeof Exam>
 }

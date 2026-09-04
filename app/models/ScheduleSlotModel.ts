@@ -31,9 +31,13 @@ export default class ScheduleSlot extends BaseModel implements IScheduleSlot {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updated_at: DateTime | undefined
 
-  @belongsTo(() => Professional)
+  @belongsTo(() => Professional, {
+    foreignKey: 'professional_id',
+  })
   declare professional: BelongsTo<typeof Professional>
 
-  @hasMany(() => Appointment)
+  @hasMany(() => Appointment, {
+    foreignKey: 'schedule_slot_id',
+  })
   declare appointments: HasMany<typeof Appointment>
 }

@@ -55,18 +55,28 @@ export default class Appointment extends BaseModel implements IAppointment {
   @column.dateTime()
   declare closed_at: DateTime | null
 
-  @belongsTo(() => Patient)
+  @belongsTo(() => Patient, {
+    foreignKey: 'patient_id',
+  })
   declare patient: BelongsTo<typeof Patient>
 
-  @belongsTo(() => Professional)
+  @belongsTo(() => Professional, {
+    foreignKey: 'professional_id',
+  })
   declare professional: BelongsTo<typeof Professional>
 
-  @belongsTo(() => Exam)
+  @belongsTo(() => Exam, {
+    foreignKey: 'exam_id',
+  })
   declare exam: BelongsTo<typeof Exam>
 
-  @belongsTo(() => Procedure)
+  @belongsTo(() => Procedure, {
+    foreignKey: 'procedure_id',
+  })
   declare procedure: BelongsTo<typeof Procedure>
 
-  @belongsTo(() => ScheduleSlot)
+  @belongsTo(() => ScheduleSlot, {
+    foreignKey: 'schedule_slot_id',
+  })
   declare scheduleSlot: BelongsTo<typeof ScheduleSlot>
 }

@@ -10,6 +10,7 @@ export default class AuthMiddleware {
       prefix + '/auth/login',
       prefix + '/auth/register',
       prefix + '/auth/confirm-email',
+      prefix + '/auth/find-by-cnjpf-username',
     ])
 
     function normalizePath(url: string) {

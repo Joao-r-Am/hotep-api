@@ -1,7 +1,7 @@
 import Professional from '#models/ProfessionalModel'
 import Exam from '#models/ExamModel'
 import Procedure from '#models/ProcedureModel'
-import BaseCrudService from './base-crud-service.js'
+import BaseCrudService, { CrudResourceConfig } from './base-crud-service.js'
 import {
   attachProfessionalExamValidator,
   attachProfessionalProcedureValidator,
@@ -9,17 +9,39 @@ import {
   updateProfessionalValidator,
 } from '#validators/clinical'
 
+export type ProfessionalsServiceDeps = Partial<
+  Pick<CrudResourceConfig, 'model' | 'createValidator' | 'updateValidator' | 'uniqueFields'> & {
+    examModel: any
+    procedureModel: any
+    attachExamValidator: CrudResourceConfig['createValidator']
+    attachProcedureValidator: CrudResourceConfig['createValidator']
+  }
+>
+
 export default class ProfessionalsService extends BaseCrudService {
-  constructor() {
+  private readonly examModel: any
+  private readonly procedureModel: any
+  private readonly attachExamValidator: CrudResourceConfig['createValidator']
+  private readonly attachProcedureValidator: CrudResourceConfig['createValidator']
+
+  constructor(deps: ProfessionalsServiceDeps = {}) {
     super({
-      model: Professional,
+      model: deps.model ?? Professional,
       notFoundMessage: 'Professional not found',
       softDeleteColumn: 'deleted_at',
-      createValidator: createProfessionalValidator,
-      updateValidator: updateProfessionalValidator,
-      uniqueFields: [{ field: 'document', message: 'Professional document already exists' }],
+      createValidator: deps.createValidator ?? createProfessionalValidator,
+      updateValidator: deps.updateValidator ?? updateProfessionalValidator,
+      uniqueFields: deps.uniqueFields ?? [
+        { field: 'document', message: 'Professional document already exists' },
+      ],
       defaultReadPreloads: ['exams', 'procedures'],
     })
+
+    this.examModel = deps.examModel ?? Exam
+    this.procedureModel = deps.procedureModel ?? Procedure
+    this.attachExamValidator = deps.attachExamValidator ?? attachProfessionalExamValidator
+    this.attachProcedureValidator =
+      deps.attachProcedureValidator ?? attachProfessionalProcedureValidator
   }
 
   async listExams(id: string) {
@@ -35,7 +57,7 @@ export default class ProfessionalsService extends BaseCrudService {
 
   async attachExam(id: string, payload: Record<string, unknown>) {
     const professional: any = await this.findByIdOrFail(id)
-    const { exam_id } = await attachProfessionalExamValidator.validate(payload)
+    const { exam_id } = await this.attachExamValidator!.validate(payload)
 
     await this.ensureExamExists(exam_id)
 
@@ -57,7 +79,11 @@ export default class ProfessionalsService extends BaseCrudService {
 
   async detachExam(id: string, examId: string) {
     const professional: any = await this.findByIdOrFail(id)
-    const existingExam = await professional.related('exams').query().where('exams.id', examId).first()
+    const existingExam = await professional
+      .related('exams')
+      .query()
+      .where('exams.id', examId)
+      .first()
 
     if (!existingExam) {
       throw { message: 'Exam link not found', status: 404 }
@@ -80,7 +106,7 @@ export default class ProfessionalsService extends BaseCrudService {
 
   async attachProcedure(id: string, payload: Record<string, unknown>) {
     const professional: any = await this.findByIdOrFail(id)
-    const { procedure_id } = await attachProfessionalProcedureValidator.validate(payload)
+    const { procedure_id } = await this.attachProcedureValidator!.validate(payload)
 
     await this.ensureProcedureExists(procedure_id)
 
@@ -117,7 +143,7 @@ export default class ProfessionalsService extends BaseCrudService {
   }
 
   private async ensureExamExists(id: string) {
-    const exam = await Exam.query().where('id', id).whereNull('deleted_at').first()
+    const exam = await this.examModel.query().where('id', id).whereNull('deleted_at').first()
 
     if (!exam) {
       throw { message: 'Exam not found', status: 404 }
@@ -125,7 +151,11 @@ export default class ProfessionalsService extends BaseCrudService {
   }
 
   private async ensureProcedureExists(id: string) {
-    const procedure = await Procedure.query().where('id', id).whereNull('deleted_at').first()
+    const procedure = await this.procedureModel
+      .query()
+      .where('id', id)
+      .whereNull('deleted_at')
+      .first()
 
     if (!procedure) {
       throw { message: 'Procedure not found', status: 404 }

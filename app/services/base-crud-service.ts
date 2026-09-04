@@ -1,21 +1,21 @@
 import { DateTime } from 'luxon'
 
-type CompiledValidator = {
+export type CompiledValidator = {
   validate(data: Record<string, unknown>): Promise<any>
 }
 
-type UniqueField = {
+export type UniqueField = {
   field: string
   message: string
 }
 
-type CrudListOptions = {
+export type CrudListOptions = {
   page: number
   limit: number
   preloads: string[]
 }
 
-type CrudResourceConfig = {
+export type CrudResourceConfig = {
   model: any
   notFoundMessage: string
   orderBy?: string
@@ -27,7 +27,7 @@ type CrudResourceConfig = {
 }
 
 export default class BaseCrudService {
-  constructor(private readonly config: CrudResourceConfig) {}
+  constructor(protected readonly config: CrudResourceConfig) {}
 
   async create(payload: Record<string, unknown>) {
     const validated = await this.validatePayload(this.config.createValidator, payload)

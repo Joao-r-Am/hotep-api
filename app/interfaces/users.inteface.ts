@@ -3,6 +3,8 @@ import { DateTime } from 'luxon'
 export interface IUser {
   id: string
   name: string
+  lastname: string
+  username: string
   cnpjf: string
   password: string
   email: string
