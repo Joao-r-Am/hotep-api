@@ -58,7 +58,7 @@ export default class AuthService {
       username = `${user.name.toLocaleLowerCase()}.${user.lastname.toLocaleLowerCase()}`;
     }
 
-    const created_user = await this.userModel.create({ ...validate, active: false, username });
+    const created_user = await this.userModel.create({ ...validate, active: true, username });
 
     created_user.password = undefined!;
     const code = await this.generateCode(created_user.id);
@@ -72,8 +72,11 @@ export default class AuthService {
 
   async login(auth: { identificator: string; password: string }) {
     const { identificator, password } = auth;
-    const check = this.userModel.verifyCredentials(identificator, password);
-    return check;
+    const user = await this.userModel.verifyCredentials(identificator, password);
+    if (!user.active) {
+      throw { message: 'E-mail não confirmado. Verifique sua caixa de entrada.', status: 403 };
+    }
+    return user;
   }
 
   async findById(id: string) {

@@ -51,11 +51,11 @@ test.group('AuthService', (group) => {
     const result = await service.register(registerPayload({ lastname: 'Oliveira' }));
 
     assert.equal(result.username, 'ana.oliveira');
-    assert.equal(result.active, false);
+    assert.equal(result.active, true);
     assert.equal(result.access_type, AccessType.BASIC);
     assert.isTrue(userModel.create.calledTimes() === 1);
     const createdPayload = userModel.create.calls[0].args[0] as Record<string, unknown>;
-    assert.isTrue(createdPayload.active === false);
+    assert.isTrue(createdPayload.active === true);
     assert.isTrue(createdPayload.username === 'ana.oliveira');
     assert.isTrue(codeModel.create.calledTimes() === 1);
     assert.isTrue(emailsQueue.addJobs.calledTimes() === 1);
@@ -89,13 +89,23 @@ test.group('AuthService', (group) => {
   });
 
   test('login retorna as credenciais verificadas pelo model', async ({ assert }) => {
-    const expected = makeUser();
+    const expected = makeUser({ active: true });
     userModel.verifyCredentials = createSpy(async () => expected);
 
     const result = await service.login({ identificator: 'ana@example.com', password: 'senha123' });
 
     assert.equal(result, expected);
     assert.isTrue(userModel.verifyCredentials.calledWith('ana@example.com', 'senha123'));
+  });
+
+  test('login lança 403 quando o usuário está inativo', async ({ assert }) => {
+    const expected = makeUser();
+    userModel.verifyCredentials = createSpy(async () => expected);
+
+    await expectError(assert, () => service.login({ identificator: 'ana@example.com', password: 'senha123' }), {
+      status: 403,
+      message: 'E-mail não confirmado. Verifique sua caixa de entrada.',
+    });
   });
 
   test('findById retorna o usuário encontrado', async ({ assert }) => {

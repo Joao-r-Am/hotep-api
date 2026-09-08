@@ -33,6 +33,8 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
   .tap((app) => {
     app.booting(async () => {
       await import('#start/env')
+      const { default: emailsQueue } = await import('../app/queues/auth/emails.queue.js')
+      await emailsQueue.startWorker()
     })
     app.listen('SIGTERM', () => app.terminate())
     app.listenIf(app.managedByPm2, 'SIGINT', () => app.terminate())

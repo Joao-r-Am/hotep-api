@@ -1,80 +1,80 @@
-import { DateTime } from 'luxon'
-import hash from '@adonisjs/core/services/hash'
-import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
-import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
-import type { UUID } from 'crypto'
-import { AccessType, EspecialtyArea, IUser } from '../interfaces/users.inteface.js'
+import { DateTime } from 'luxon';
+import hash from '@adonisjs/core/services/hash';
+import { compose } from '@adonisjs/core/helpers';
+import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm';
+import { withAuthFinder } from '@adonisjs/auth/mixins/lucid';
+import type { UUID } from 'crypto';
+import { AccessType, EspecialtyArea, IUser } from '../interfaces/users.inteface.js';
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email', 'cnpjf'],
   passwordColumnName: 'password',
-})
+});
 
 export default class User extends compose(BaseModel, AuthFinder) implements IUser {
   @beforeCreate()
   static async hashPassword(user: any) {
     if (user.password) {
-      user.password = await hash.use('scrypt').make(user.password)
+      user.password = await hash.use('scrypt').make(user.password);
     }
   }
   @column({ isPrimary: true })
-  declare id: UUID
+  declare id: UUID;
 
   @column()
-  declare name: string
+  declare name: string;
 
   @column()
-  declare lastname: string
+  declare lastname: string;
 
   @column()
-  declare username: string
+  declare username: string;
 
   @column({})
-  declare cnpjf: string
+  declare cnpjf: string;
 
   @column({ serializeAs: null })
-  declare password: string
+  declare password: string;
 
   @column()
-  declare email: string
+  declare email: string;
 
   @column()
-  declare phone: string
+  declare phone: string;
 
   @column()
-  declare site_page: string
+  declare site_page: string;
 
   @column.dateTime({ autoCreate: false })
-  declare birthday: DateTime
+  declare birthday: DateTime;
 
   @column()
-  declare access_type: AccessType
+  declare access_type: AccessType;
 
   @column()
-  declare especialty_area: EspecialtyArea
+  declare especialty_area: EspecialtyArea;
 
   @column()
-  declare roles: Array<string>
+  declare roles: Array<string>;
 
   @column()
-  declare logo: string
+  declare logo: string;
 
   @column()
-  declare max_users: number
+  declare max_users: number;
 
   @column.dateTime({ autoCreate: false })
-  declare sub_expires_at: DateTime
+  declare sub_expires_at: DateTime;
 
   @column()
-  declare active: boolean
+  declare active: boolean;
 
   @column.dateTime()
-  declare deleted_at: DateTime
+  declare deleted_at: DateTime;
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
+  declare updatedAt: DateTime | null;
 }
