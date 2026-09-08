@@ -1,16 +1,20 @@
+import BaseCrudService, { CrudResourceConfig } from './base-crud-service.js'
 import Exam from '#models/ExamModel'
-import BaseCrudService from './base-crud-service.js'
 import { createExamValidator, updateExamValidator } from '#validators/clinical'
 
+export type ExamsServiceDeps = Partial<
+  Pick<CrudResourceConfig, 'model' | 'createValidator' | 'updateValidator' | 'uniqueFields'>
+>
+
 export default class ExamsService extends BaseCrudService {
-  constructor() {
+  constructor(deps: ExamsServiceDeps = {}) {
     super({
-      model: Exam,
+      model: deps.model ?? Exam,
       notFoundMessage: 'Exam not found',
       softDeleteColumn: 'deleted_at',
-      createValidator: createExamValidator,
-      updateValidator: updateExamValidator,
-      uniqueFields: [{ field: 'code', message: 'Exam code already exists' }],
+      createValidator: deps.createValidator ?? createExamValidator,
+      updateValidator: deps.updateValidator ?? updateExamValidator,
+      uniqueFields: deps.uniqueFields ?? [{ field: 'code', message: 'Exam code already exists' }],
     })
   }
 }

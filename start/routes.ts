@@ -8,8 +8,6 @@
 |
 */
 
-import routes from "../app/routes/index.js";
-
-
+import routes from '../app/routes/index.js'
 
 routes()

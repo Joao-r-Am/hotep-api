@@ -36,6 +36,8 @@ export default class Patient extends BaseModel implements Exclude<IPatient, 'id'
   @column.dateTime()
   declare deleted_at: DateTime | undefined
 
-  @hasMany(() => Appointment)
+  @hasMany(() => Appointment, {
+    foreignKey: 'patient_id',
+  })
   declare appointments: HasMany<typeof Appointment>
 }

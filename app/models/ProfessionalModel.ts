@@ -42,10 +42,14 @@ export default class Professional extends BaseModel implements IProfessional {
   @column.dateTime()
   declare deleted_at: DateTime | undefined
 
-  @hasMany(() => Appointment)
+  @hasMany(() => Appointment, {
+    foreignKey: 'professional_id',
+  })
   declare appointments: HasMany<typeof Appointment>
 
-  @hasMany(() => ScheduleSlot)
+  @hasMany(() => ScheduleSlot, {
+    foreignKey: 'professional_id',
+  })
   declare scheduleSlots: HasMany<typeof ScheduleSlot>
 
   @manyToMany(() => Exam, {

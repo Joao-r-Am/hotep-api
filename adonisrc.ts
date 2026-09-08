@@ -25,7 +25,11 @@ export default defineConfig({
   | will be scanned automatically from the "./commands" directory.
   |
   */
-  commands: [() => import('@adonisjs/core/commands'), () => import('@adonisjs/lucid/commands'), () => import('@adonisjs/mail/commands')],
+  commands: [
+    () => import('@adonisjs/core/commands'),
+    () => import('@adonisjs/lucid/commands'),
+    () => import('@adonisjs/mail/commands'),
+  ],
 
   /*
   |--------------------------------------------------------------------------
@@ -47,7 +51,8 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/lucid/database_provider'),
     () => import('@adonisjs/mail/mail_provider'),
-    () => import('@adonisjs/core/providers/edge_provider')
+    () => import('@adonisjs/limiter/limiter_provider'),
+    () => import('@adonisjs/core/providers/edge_provider'),
   ],
 
   /*
@@ -72,7 +77,7 @@ export default defineConfig({
   tests: {
     suites: [
       {
-        files: ['tests/unit/**/*.spec(.ts|.js)'],
+        files: ['tests/unit/**/*.spec(.ts|.js)', 'app/services/**/*.spec(.ts|.js)'],
         name: 'unit',
         timeout: 2000,
       },
@@ -84,8 +89,10 @@ export default defineConfig({
     ],
     forceExit: false,
   },
-  metaFiles: [{
-    pattern: 'resources/views/**/*.edge',
-    reloadServer: false,
-  }]
+  metaFiles: [
+    {
+      pattern: 'resources/views/**/*.edge',
+      reloadServer: false,
+    },
+  ],
 })

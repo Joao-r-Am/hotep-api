@@ -1,29 +1,35 @@
 import mail from '@adonisjs/mail/services/main'
-import { Queue, QueueEvents, Worker } from 'bullmq'
-import { randomUUID } from 'crypto'
-import { Redis } from 'ioredis'
-import fs from 'fs'
+import { Queue, QueueEvents, Worker, type Job } from 'bullmq'
+import { randomUUID } from 'node:crypto'
+import fs from 'node:fs'
 import edge from 'edge.js'
 import { IUser } from '../../interfaces/users.inteface.js'
+import getRedis from '#config/redis'
 
 const QUEUE_NAME = 'confirmation'
 
-const connection = new Redis({
-  maxRetriesPerRequest: null,
-})
-const my_queue = new Queue(QUEUE_NAME, { connection })
-const queue_events = new QueueEvents(QUEUE_NAME, { connection })
+let my_queue: Queue | null = null
+let queue_events: QueueEvents | null = null
+let worker: Worker | null = null
 
-async function addJobs(data?: {user_data: IUser, code: string}) {
-  await my_queue.add(QUEUE_NAME, data)
+function getQueue() {
+  if (!my_queue) {
+    my_queue = new Queue(QUEUE_NAME, { connection: getRedis() })
+  }
+  return my_queue
 }
 
-const queue = async (payload: any) => {
+function getQueueEvents() {
+  if (!queue_events) {
+    queue_events = new QueueEvents(QUEUE_NAME, { connection: getRedis() })
+  }
+  return queue_events
+}
+
+const queue = async (payload: unknown) => {
   const job_id = randomUUID()
 
-  console.log('Adding job to queue -> ', job_id)
-
-  await my_queue.add(QUEUE_NAME, payload, {
+  await getQueue().add(QUEUE_NAME, payload, {
     jobId: job_id,
     removeOnComplete: {
       age: 60 * 60,
@@ -34,39 +40,51 @@ const queue = async (payload: any) => {
       count: 10,
     },
   })
+}
 
-  queue_events.on('duplicated', async ({ jobId }: { jobId: string }) => {
-    console.log('Job duplicated -> ', jobId)
+const addJobs = async (data?: { user_data: IUser; code: string }) => {
+  await getQueue().add(QUEUE_NAME, data)
+}
+
+async function processJob(job: Job) {
+  const { user_data, code } = job.data
+
+  const buffer = fs.readFileSync('./assets/medkit-logo.png')
+  const photo = `data:image/png;base64,${buffer.toString('base64')}`
+
+  const html = await edge.render('templates/emails/confirmation', {
+    name: user_data.name,
+    photo,
+    code,
+  })
+
+  return await mail.send((msg) => {
+    msg
+      .to(user_data.email)
+      .from(process.env.SMTP_USERNAME ?? 'joaoric.amorim@gmail.com')
+      .subject('Confirmação de cadastro')
+      .html(html)
   })
 }
 
-const worker = new Worker(
-  QUEUE_NAME,
-  async (job) => {
-    try {
-      const { user_data, code } = job.data
+async function startWorker() {
+  if (worker) {
+    return worker
+  }
 
-      const buffer = fs.readFileSync('./assets/medkit-logo.png')
-      const photo = `data:image/png;base64,${buffer.toString('base64')}`
+  worker = new Worker(QUEUE_NAME, processJob, { connection: getRedis() })
 
-      const html= await edge.render('templates/emails/confirmation', { name: user_data.name, photo, code })
+  getQueueEvents().on('duplicated', ({ jobId }: { jobId: string }) => {
+    console.log('Job duplicated -> ', jobId)
+  })
 
-      return await mail.send((msg) => {
-        msg.to(user_data.email).from('joaoric.amorim@gmail.com').subject('Confirmação de cadastro').html(html)
-      })
-    } catch (err) {
-      throw err
-    }
-  },
-  { connection }
-)
-
-await addJobs()
+  return worker
+}
 
 const emailsQueue = {
   queue,
-  worker,
   addJobs,
+  startWorker,
 }
 
 export default emailsQueue

@@ -1,6 +1,5 @@
 import router from '@adonisjs/core/services/router'
 import authRoutes from './auth.routes.js'
-import teste from './teste.route.js'
 import patientsRoutes from './patients.route.js'
 import professionalsRoutes from './professionals.route.js'
 import proceduresRoutes from './procedures.route.js'
@@ -18,7 +17,6 @@ const routes = () =>
       examsRoutes()
       scheduleSlotsRoutes()
       appointmentsRoutes()
-      teste()
     })
     .prefix('api/v1')
 

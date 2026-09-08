@@ -14,9 +14,13 @@ export default class ProfessionalProcedure extends BaseModel implements IProfess
   @column({ isPrimary: true })
   declare procedure_id: UUID
 
-  @belongsTo(() => Professional)
+  @belongsTo(() => Professional, {
+    foreignKey: 'professional_id',
+  })
   declare professional: BelongsTo<typeof Professional>
 
-  @belongsTo(() => Procedure)
+  @belongsTo(() => Procedure, {
+    foreignKey: 'procedure_id',
+  })
   declare procedure: BelongsTo<typeof Procedure>
 }

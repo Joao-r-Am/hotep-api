@@ -20,7 +20,30 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   /*
   |----------------------------------------------------------
-  | Variables for configuring database connection
+  | CORS allowed origins (comma separated). Use '*' for any
+  |----------------------------------------------------------
+  */
+  CORS_ORIGINS: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Redis (used by BullMQ and limiter)
+  |----------------------------------------------------------
+  */
+  REDIS_HOST: Env.schema.string({ format: 'host' }),
+  REDIS_PORT: Env.schema.number(),
+  REDIS_PSWD: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Auth (JWT)
+  |----------------------------------------------------------
+  */
+  JWT_SECRET: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Variables for configuring the database connection
   |----------------------------------------------------------
   */
   DB_HOST: Env.schema.string({ format: 'host' }),

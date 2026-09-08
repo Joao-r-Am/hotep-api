@@ -28,7 +28,9 @@ export default class Procedure extends BaseModel implements IProcedure {
   @column.dateTime()
   declare deleted_at: DateTime | undefined
 
-  @hasMany(() => Appointment)
+  @hasMany(() => Appointment, {
+    foreignKey: 'procedure_id',
+  })
   declare appointments: HasMany<typeof Appointment>
 
   @manyToMany(() => Professional, {

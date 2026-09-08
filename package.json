@@ -6,7 +6,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "node bin/server.js",
-    "db:add": "node ace make:model",
+    "db:model": "node ace make:model",
+    "db:add": "node ace make:migration",
+    "db:run": "node ace migration:run",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
     "test": "node ace test",
@@ -56,6 +58,7 @@
     "@adonisjs/auth": "^9.4.0",
     "@adonisjs/core": "^6.18.0",
     "@adonisjs/cors": "^2.2.1",
+    "@adonisjs/limiter": "^2.4.0",
     "@adonisjs/lucid": "^21.6.1",
     "@adonisjs/mail": "^9.2.2",
     "@vinejs/vine": "^3.0.1",

@@ -4,7 +4,7 @@ export default class extends BaseSchema {
   protected tableName = 'codes'
 
   async up() {
-       this.schema.raw(`
+    this.schema.raw(`
       CREATE TABLE IF NOT EXISTS codes (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         code VARCHAR(255) NOT NULL,

@@ -7,6 +7,7 @@ const authRoutes = () => {
       router.post('login', [AuthController, 'login'])
       router.post('register', [AuthController, 'register'])
       router.post('confirm-email', [AuthController, 'confirmEmail'])
+      router.post('find-by-cnjpf-username', [AuthController, 'findByCnpjfOrUsername'])
       // router.get('validate', [AuthController, 'validate'])
     })
     .prefix('auth')
