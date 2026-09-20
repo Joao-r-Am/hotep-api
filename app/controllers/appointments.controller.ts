@@ -40,13 +40,18 @@ export default class AppointmentsController {
       const pagination = parsePagination({
         page: request.input('page'),
         limit: request.input('limit'),
-      })
-      const preloads = parsePreloads(request.input('preload'), ALLOWED_PRELOADS)
-      const appointments = await this.appointmentsService.list({ ...pagination, preloads })
-      logger.info({ entity: 'appointment', ...pagination }, 'success.appointments.listed')
-      return response.status(200).json(appointments)
+      });
+      const preloads = parsePreloads(request.input('preload'), ALLOWED_PRELOADS);
+
+      const appointments = await this.appointmentsService.list({
+        ...pagination,
+        preloads,
+        request,
+      });
+      logger.info({ entity: 'appointment', ...pagination }, 'success.appointments.listed');
+      return response.status(200).json(appointments);
     } catch (error) {
-      return handleHttpError(response, error, 'appointments')
+      return handleHttpError(response, error, 'appointments');
     }
   }
 

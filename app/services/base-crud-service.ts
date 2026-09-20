@@ -13,6 +13,7 @@ export type CrudListOptions = {
   page: number
   limit: number
   preloads: string[]
+  request?: any
 }
 
 export type CrudResourceConfig = {
