@@ -43,6 +43,8 @@ dist-ssr
 coverage
 *.local
 
+scripts
+
 /cypress/videos/
 /cypress/screenshots/
 
