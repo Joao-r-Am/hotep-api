@@ -54,6 +54,15 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   /*
   |----------------------------------------------------------
+  | Auto-agendamento por link único (public scheduling)
+  |----------------------------------------------------------
+  */
+  FRONTEND_URL: Env.schema.string.optional(),
+  CLINIC_TZ: Env.schema.string.optional(),
+  CANCEL_WINDOW_HOURS: Env.schema.number.optional(),
+
+  /*
+  |----------------------------------------------------------
   | Variables for configuring the mail package
   |----------------------------------------------------------
   */

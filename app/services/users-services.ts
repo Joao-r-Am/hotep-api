@@ -43,6 +43,13 @@ export default class AuthService {
   }
 
   async register(user: Pick<IUser, 'email' | 'name' | 'password' | 'cnpjf' | 'phone' | 'especialty_area' | 'access_type' | 'lastname'>) {
+    const regex_cpf_cnpj = /(^\d{3}\.\d{3}\.\d{3}-\d{2}$)|(^\d{11}$)|(^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$)|(^\d{14}$)/;
+
+    const is_cnpjf = user.cnpjf.match(regex_cpf_cnpj);
+    if (!is_cnpjf) {
+      throw { message: 'ERROR.INVALID_CNPJF', status: 400 };
+    }
+
     const validate = await this.registerValidator!.validate(user);
     user.access_type = AccessType.BASIC;
     let username = '';
@@ -74,7 +81,7 @@ export default class AuthService {
     const { identificator, password } = auth;
     const user = await this.userModel.verifyCredentials(identificator, password);
     if (!user.active) {
-      throw { message: 'E-mail não confirmado. Verifique sua caixa de entrada.', status: 403 };
+      throw { message: 'ERROR.EMAIL_NOT_CONFIRMED', status: 403 };
     }
     return user;
   }
@@ -83,7 +90,7 @@ export default class AuthService {
     const user = await this.userModel.find(id);
 
     if (!user) {
-      throw { message: 'User not found', status: 404 };
+      throw { message: 'ERROR.USER_NOT_FOUND', status: 404 };
     }
     //TODO: limimtar dados a retornar
     return user;
@@ -97,10 +104,10 @@ export default class AuthService {
 
   async confirmEmail(code: string) {
     const code_data = await this.codeModel.findBy('code', code);
-    if (!code_data) throw { message: 'Code not found', status: 404 };
+    if (!code_data) throw { message: 'ERROR.CODE_NOT_FOUND', status: 404 };
     await this.validateCode(code_data.code);
     const user = await this.userModel.find(code_data.user_id);
-    if (!user) throw { message: 'User not found', status: 404 };
+    if (!user) throw { message: 'ERROR.USER_NOT_FOUND', status: 404 };
     user.active = true;
     await user.save();
     await code_data.delete();
@@ -109,10 +116,10 @@ export default class AuthService {
 
   async resendConfirmationCode(id: string) {
     const code_data = await this.codeModel.findBy('user_id', id);
-    if (!code_data) throw { message: 'Invalid code', status: 404 };
+    if (!code_data) throw { message: 'ERROR.INVALID_CODE', status: 404 };
     const user = await this.userModel.find(code_data.user_id);
-    if (!user) throw { message: 'User not found', status: 404 };
-    if (user.active) throw { message: 'User already confirmed', status: 400 };
+    if (!user) throw { message: 'ERROR.USER_NOT_FOUND', status: 404 };
+    if (user.active) throw { message: 'ERROR.USER_ALREADY_CONFIRMED', status: 400 };
     const code = await this.generateCode(user.id);
     await Promise.all([this.emailsQueue!.addJobs({ user_data: user.$attributes as IUser, code: code.code }), code_data.delete()]);
     return true;

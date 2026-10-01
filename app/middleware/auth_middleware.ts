@@ -14,6 +14,7 @@ export default class AuthMiddleware {
       prefix + '/auth/confirm-email',
       prefix + '/auth/find-by-cnjpf-username',
     ]);
+    const publicPrefixes = [prefix + '/public'];
 
     function normalizePath(url: string) {
       const [path] = url.split('?');
@@ -22,7 +23,8 @@ export default class AuthMiddleware {
     }
 
     function isPublicRoute(path: string) {
-      return publicRoutes.has(path);
+      if (publicRoutes.has(path)) return true
+      return publicPrefixes.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`))
     }
 
     try {
