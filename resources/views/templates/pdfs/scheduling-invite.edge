@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Convite de agendamento — {{ clinicName }}</title>
+    <style>
+      /* ─── Impressão ────────────────────────────────────────────── */
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        /* O PDF é uma página só: sem cor de fundo e sem quebra unwanted. */
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body {
+        height: 297mm;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #2a1a1a;
+        background: #ffffff;
+      }
+
+      /* ─── Tokens de marca ──────────────────────────────────────── */
+
+      :root {
+        --caret: #2a1a1a;
+        --caret-dark: #3d1f1f;
+        --brown: #562c2c;
+        --sage: #4e6e5d;
+        --sand: #fbf2e3;
+        --border: #e7e5e4;
+        --muted: #6b665f;
+        --muted-light: #9a938a;
+      }
+
+      /* ─── Faixas ───────────────────────────────────────────────── */
+
+      .band {
+        height: 5mm;
+        flex: none;
+        background: linear-gradient(90deg, var(--brown) 0%, var(--sage) 100%);
+      }
+
+      .band--bottom {
+        background: var(--caret);
+      }
+
+      /* ─── Corpo ────────────────────────────────────────────────── */
+
+      .sheet {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 14mm 20mm 8mm;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 8mm;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .header__logo {
+        max-height: 12mm;
+        width: auto;
+      }
+
+      .header__clinic {
+        text-align: right;
+      }
+
+      .header__name {
+        font-size: 10pt;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .header__phone {
+        margin-top: 1mm;
+        font-size: 8.5pt;
+        color: var(--muted);
+      }
+
+      .eyebrow {
+        margin-top: 9mm;
+        font-size: 7.5pt;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--sage);
+      }
+
+      .headline {
+        margin-top: 3mm;
+        font-size: 22pt;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+
+      .subhead {
+        margin-top: 2.5mm;
+        font-size: 10pt;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      /* ─── Resumo do horário ────────────────────────────────────── */
+
+      .summary {
+        display: flex;
+        align-items: center;
+        margin-top: 8mm;
+        padding: 6mm;
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 3mm;
+        page-break-inside: avoid;
+      }
+
+      .summary__badge {
+        flex: none;
+        width: 18mm;
+        height: 18mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--sand);
+        border-radius: 3mm;
+      }
+
+      .summary__day {
+        font-size: 20pt;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .summary__month {
+        margin-top: 1mm;
+        font-size: 7pt;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .summary__info {
+        flex: 1;
+        margin-left: 6mm;
+      }
+
+      .summary__time {
+        font-size: 13pt;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .summary__date {
+        margin-top: 1.5mm;
+        font-size: 9.5pt;
+        color: var(--muted);
+      }
+
+      .chip {
+        flex: none;
+        padding: 2mm 3.5mm;
+        border: 1px solid var(--sage);
+        border-radius: 1mm;
+        font-size: 7.5pt;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sage);
+      }
+
+      .chip--cancelled {
+        border-color: var(--brown);
+        color: var(--brown);
+      }
+
+      /* ─── Ficha ────────────────────────────────────────────────── */
+
+      .card {
+        margin-top: 6mm;
+        border: 1px solid var(--border);
+        border-radius: 3mm;
+        overflow: hidden;
+        page-break-inside: avoid;
+      }
+
+      .row {
+        display: flex;
+        align-items: baseline;
+        padding: 4.5mm 6mm;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .row:last-child {
+        border-bottom: none;
+      }
+
+      .row__label {
+        flex: none;
+        width: 38mm;
+        font-size: 7.5pt;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .row__value {
+        flex: 1;
+        font-size: 10.5pt;
+        line-height: 1.45;
+      }
+
+      .row__hint {
+        display: block;
+        margin-top: 1mm;
+        font-size: 8.5pt;
+        color: var(--muted);
+      }
+
+      /* ─── QR Code ──────────────────────────────────────────────── */
+
+      .verify {
+        display: flex;
+        align-items: center;
+        margin-top: 6mm;
+        padding: 6mm;
+        background: var(--sand);
+        border: 1px solid var(--border);
+        border-radius: 3mm;
+        page-break-inside: avoid;
+      }
+
+      .verify__qr {
+        flex: none;
+        width: 32mm;
+        height: 32mm;
+        padding: 2mm;
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 2mm;
+      }
+
+      .verify__text {
+        flex: 1;
+        margin-left: 6mm;
+      }
+
+      .verify__title {
+        font-size: 10.5pt;
+        font-weight: 700;
+      }
+
+      .verify__hint {
+        margin-top: 1.5mm;
+        font-size: 9pt;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .verify__url {
+        display: inline-block;
+        margin-top: 2.5mm;
+        font-size: 8.5pt;
+        font-weight: 600;
+        color: var(--sage);
+        word-break: break-all;
+      }
+
+      /* ─── Cancelamento ─────────────────────────────────────────── */
+
+      .note {
+        margin-top: 6mm;
+        padding-left: 3mm;
+        border-left: 2px solid var(--sage);
+        font-size: 8.5pt;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .note strong {
+        color: var(--caret);
+        font-weight: 600;
+      }
+
+      /* ─── Rodapé ───────────────────────────────────────────────── */
+
+      .footer {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 5mm 20mm;
+        border-top: 1px solid var(--border);
+        font-size: 7.5pt;
+        color: var(--muted-light);
+        letter-spacing: 0.04em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="band"></div>
+
+    <div class="sheet">
+      <div class="header">
+        @if(logo)
+        <img class="header__logo" src="{{ logo }}" alt="{{ clinicName }}" />
+        @endif
+        <div class="header__clinic">
+          <div class="header__name">{{ clinicName }}</div>
+          @if(clinicPhone)
+          <div class="header__phone">{{ clinicPhone }}</div>
+          @endif
+        </div>
+      </div>
+
+      <div class="eyebrow">Convite de agendamento</div>
+      @if(isCancelled)
+      <h1 class="headline">Este agendamento foi cancelado</h1>
+      <p class="subhead">
+        Este documento não é válido para atendimento. Fale com a clínica para
+        remarcar.
+      </p>
+      @else
+      <h1 class="headline">Você tem um horário confirmado</h1>
+      <p class="subhead">
+        Apresente este documento na recepção no dia da consulta.
+      </p>
+      @endif
+
+      <div class="summary">
+        <div class="summary__badge">
+          <span class="summary__day">{{ dayLabel }}</span>
+          <span class="summary__month">{{ monthLabel }}</span>
+        </div>
+        <div class="summary__info">
+          <div class="summary__time">{{ timeLabel }}</div>
+          <div class="summary__date">{{ dateLabel }}</div>
+        </div>
+        <div class="{{ statusChipClass }}">{{ statusLabel }}</div>
+      </div>
+
+      <div class="card">
+        <div class="row">
+          <div class="row__label">Profissional</div>
+          <div class="row__value">
+            {{ professionalName }}
+            @if(professionalSpecialty)
+            <span class="row__hint">{{ professionalSpecialty }}</span>
+            @endif
+            @if(professionalRegistration)
+            <span class="row__hint">{{ professionalRegistration }}</span>
+            @endif
+          </div>
+        </div>
+        @if(serviceName)
+        <div class="row">
+          <div class="row__label">{{ serviceKindLabel }}</div>
+          <div class="row__value">{{ serviceName }}</div>
+        </div>
+        @endif
+        <div class="row">
+          <div class="row__label">Data e hora</div>
+          <div class="row__value">
+            {{ dateLabel }}
+            <span class="row__hint">{{ timeHintLabel }}</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row__label">Local</div>
+          <div class="row__value">
+            {{ clinicName }}
+            @if(clinicPhone)
+            <span class="row__hint">{{ clinicPhone }}</span>
+            @endif
+          </div>
+        </div>
+      </div>
+
+      <div class="verify">
+        <img class="verify__qr" src="{{ qrCode }}" alt="QR Code do agendamento" />
+        <div class="verify__text">
+          @if(isCancelled)
+          <div class="verify__title">Agendamento cancelado</div>
+          <div class="verify__hint">
+            O link abaixo apenas consulta o histórico deste cancelamento.
+          </div>
+          @else
+          <div class="verify__title">Comprovação do agendamento</div>
+          <div class="verify__hint">
+            Aponte a câmera do celular para reabrir este agendamento, conferir os
+            horários ou cancelar.
+          </div>
+          @endif
+          <div class="verify__url">{{ manageUrl }}</div>
+        </div>
+      </div>
+
+      @if(isCancelled)
+      <div class="note">
+        <strong>Este horário foi cancelado.</strong> Para marcar uma nova consulta,
+        fale com a clínica.
+      </div>
+      @else
+      <div class="note">
+        <strong>Precisa remarcar ou cancelar?</strong> Faça pelo link acima com no mínimo
+        {{ cancelWindowLabel }} de antecedência. Depois desse prazo, fale com a clínica.
+      </div>
+      @endif
+    </div>
+
+    <div class="footer">
+      <span>{{ footerClinicLine }}</span>
+      <span>Documento gerado em {{ issuedAtLabel }}</span>
+    </div>
+
+    <div class="band band--bottom"></div>
+  </body>
+</html>

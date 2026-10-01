@@ -104,7 +104,7 @@ test.group('AuthService', (group) => {
 
     await expectError(assert, () => service.login({ identificator: 'ana@example.com', password: 'senha123' }), {
       status: 403,
-      message: 'E-mail não confirmado. Verifique sua caixa de entrada.',
+      message: 'ERROR.EMAIL_NOT_CONFIRMED',
     });
   });
 
@@ -123,7 +123,7 @@ test.group('AuthService', (group) => {
 
     await expectError(assert, () => service.findById('user-invalid'), {
       status: 404,
-      message: 'User not found',
+      message: 'ERROR.USER_NOT_FOUND',
     });
   });
 
@@ -159,7 +159,7 @@ test.group('AuthService', (group) => {
 
     await expectError(assert, () => service.confirmEmail('INVALID'), {
       status: 404,
-      message: 'Code not found',
+      message: 'ERROR.CODE_NOT_FOUND',
     });
   });
 
@@ -181,7 +181,7 @@ test.group('AuthService', (group) => {
 
     await expectError(assert, () => service.confirmEmail('ABC123'), {
       status: 404,
-      message: 'User not found',
+      message: 'ERROR.USER_NOT_FOUND',
     });
   });
 
@@ -190,7 +190,7 @@ test.group('AuthService', (group) => {
 
     await expectError(assert, () => service.resendConfirmationCode('user-1'), {
       status: 404,
-      message: 'Invalid code',
+      message: 'ERROR.INVALID_CODE',
     });
   });
 
@@ -202,7 +202,7 @@ test.group('AuthService', (group) => {
 
     await expectError(assert, () => service.resendConfirmationCode('user-1'), {
       status: 400,
-      message: 'User already confirmed',
+      message: 'ERROR.USER_ALREADY_CONFIRMED',
     });
     assert.isTrue(emailsQueue.addJobs.calledTimes() === 0);
   });

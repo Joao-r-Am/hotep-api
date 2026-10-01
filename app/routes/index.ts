@@ -6,6 +6,8 @@ import proceduresRoutes from './procedures.route.js'
 import examsRoutes from './exams.route.js'
 import scheduleSlotsRoutes from './schedule-slots.route.js'
 import appointmentsRoutes from './appointments.route.js'
+import schedulingInvitesRoutes from './scheduling-invites.route.js'
+import publicSchedulingRoutes from './public-scheduling.route.js'
 
 const routes = () =>
   router
@@ -17,6 +19,8 @@ const routes = () =>
       examsRoutes()
       scheduleSlotsRoutes()
       appointmentsRoutes()
+      schedulingInvitesRoutes()
+      publicSchedulingRoutes()
     })
     .prefix('api/v1')
 
