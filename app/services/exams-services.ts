@@ -1,4 +1,5 @@
-import BaseCrudService, { CrudResourceConfig } from './base-crud-service.js'
+import BaseCrudService from './base-crud-service.js'
+import type { CrudResourceConfig } from '../interfaces/base-crud.interface.js'
 import Exam from '#models/ExamModel'
 import { createExamValidator, updateExamValidator } from '#validators/clinical'
 

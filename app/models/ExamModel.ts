@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
 import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
-import type { UUID } from 'crypto'
+import type { UUID } from 'node:crypto'
 import { IExam } from '../interfaces/exam.interface.js'
 import Appointment from './AppointmentModel.js'
 import Professional from './ProfessionalModel.js'

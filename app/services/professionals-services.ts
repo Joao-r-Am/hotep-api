@@ -1,26 +1,20 @@
 import Professional from '#models/ProfessionalModel'
 import Exam from '#models/ExamModel'
 import Procedure from '#models/ProcedureModel'
-import BaseCrudService, { CrudResourceConfig } from './base-crud-service.js'
+import type { LucidModel } from '@adonisjs/lucid/types/model'
+import BaseCrudService from './base-crud-service.js'
 import {
   attachProfessionalExamValidator,
   attachProfessionalProcedureValidator,
   createProfessionalValidator,
   updateProfessionalValidator,
 } from '#validators/clinical'
-
-export type ProfessionalsServiceDeps = Partial<
-  Pick<CrudResourceConfig, 'model' | 'createValidator' | 'updateValidator' | 'uniqueFields'> & {
-    examModel: any
-    procedureModel: any
-    attachExamValidator: CrudResourceConfig['createValidator']
-    attachProcedureValidator: CrudResourceConfig['createValidator']
-  }
->
+import { CrudResourceConfig } from '../interfaces/base-crud.interface.js'
+import { ProfessionalsServiceDeps } from '../interfaces/professional.interface.js'
 
 export default class ProfessionalsService extends BaseCrudService {
-  private readonly examModel: any
-  private readonly procedureModel: any
+  private readonly examModel: LucidModel
+  private readonly procedureModel: LucidModel
   private readonly attachExamValidator: CrudResourceConfig['createValidator']
   private readonly attachProcedureValidator: CrudResourceConfig['createValidator']
 
@@ -59,7 +53,7 @@ export default class ProfessionalsService extends BaseCrudService {
     const professional: any = await this.findByIdOrFail(id)
     const { exam_id } = await this.attachExamValidator!.validate(payload)
 
-    await this.ensureExamExists(exam_id)
+    await this.ensureExamExists(String(exam_id))
 
     const existingExam = await professional
       .related('exams')
@@ -108,7 +102,7 @@ export default class ProfessionalsService extends BaseCrudService {
     const professional: any = await this.findByIdOrFail(id)
     const { procedure_id } = await this.attachProcedureValidator!.validate(payload)
 
-    await this.ensureProcedureExists(procedure_id)
+    await this.ensureProcedureExists(String(procedure_id))
 
     const existingProcedure = await professional
       .related('procedures')

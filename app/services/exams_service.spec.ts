@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import ExamsService from './exams-services.js'
 import { createQueryBuilderMock } from '../../tests/unit/helpers/mock_query_builder.js'
 import { createRecordMock } from '../../tests/unit/helpers/mock_record.js'
-import { createModelMock, ModelMock } from '../../tests/unit/helpers/model_mocks.js'
+import { createModelMock, ModelMock, asLucidModel } from '../../tests/unit/helpers/model_mocks.js'
 import { createSpy } from '../../tests/unit/helpers/spy.js'
 import { expectError } from '../../tests/unit/helpers/expect_error.js'
 import { examPayload, serializedExam } from '../../tests/unit/fixtures/exams.js'
@@ -16,7 +16,7 @@ test.group('ExamsService', (group) => {
     const createValidator = createSpy(async () => examPayload())
     const updateValidator = createSpy(async (payload: Record<string, unknown>) => payload)
     service = new ExamsService({
-      model,
+      model: asLucidModel(model),
       createValidator: { validate: createValidator },
       updateValidator: { validate: updateValidator },
     })

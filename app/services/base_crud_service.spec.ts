@@ -3,7 +3,7 @@ import BaseCrudService from './base-crud-service.js'
 import { createQueryBuilderMock } from '../../tests/unit/helpers/mock_query_builder.js'
 import { createRecordMock } from '../../tests/unit/helpers/mock_record.js'
 import { createPaginatorMock } from '../../tests/unit/helpers/mock_paginator.js'
-import { createModelMock, ModelMock } from '../../tests/unit/helpers/model_mocks.js'
+import { createModelMock, ModelMock, asLucidModel } from '../../tests/unit/helpers/model_mocks.js'
 import { createSpy } from '../../tests/unit/helpers/spy.js'
 import { expectError } from '../../tests/unit/helpers/expect_error.js'
 import { serializedPatient, patientId, patientPayload } from '../../tests/unit/fixtures/patients.js'
@@ -14,7 +14,7 @@ test.group('BaseCrudService', (group) => {
 
   const setupService = (config: Record<string, unknown> = {}) => {
     service = new BaseCrudService({
-      model,
+      model: asLucidModel(model),
       notFoundMessage: 'Patient not found',
       ...config,
     })

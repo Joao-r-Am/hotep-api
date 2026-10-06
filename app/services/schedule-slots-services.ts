@@ -1,6 +1,7 @@
 import Professional from '#models/ProfessionalModel'
 import ScheduleSlot from '#models/ScheduleSlotModel'
-import BaseCrudService, { CrudResourceConfig } from './base-crud-service.js'
+import BaseCrudService from './base-crud-service.js'
+import type { CrudResourceConfig } from '../interfaces/base-crud.interface.js'
 import { createScheduleSlotValidator, updateScheduleSlotValidator } from '#validators/clinical'
 
 export type ScheduleSlotsServiceDeps = Partial<
