@@ -23,8 +23,8 @@ export default class AuthMiddleware {
     }
 
     function isPublicRoute(path: string) {
-      if (publicRoutes.has(path)) return true
-      return publicPrefixes.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`))
+      if (publicRoutes.has(path)) return true;
+      return publicPrefixes.some((publicPath) => path === publicPath || path.startsWith(`${publicPath}/`));
     }
 
     try {
@@ -74,9 +74,16 @@ export default class AuthMiddleware {
         });
       }
 
-      (ctx as any).auth = {
-        user: user.serialize(),
-        isAuthenticated: true,
+      ctx.auth = {
+        user: {
+          user_id: String(user.id),
+          name: user.name,
+          email: user.email,
+          cnpjf: user.cnpjf,
+          especialty_area: user.especialty_area,
+          access_type: user.access_type,
+        },
+        is_authenticated: true,
       };
 
       const output = await next();

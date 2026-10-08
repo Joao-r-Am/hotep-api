@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import AppointmentsService from './appointments-services.js'
 import { createQueryBuilderMock } from '../../tests/unit/helpers/mock_query_builder.js'
 import { createRecordMock } from '../../tests/unit/helpers/mock_record.js'
-import { createModelMock, ModelMock } from '../../tests/unit/helpers/model_mocks.js'
+import { createModelMock, ModelMock, asLucidModel } from '../../tests/unit/helpers/model_mocks.js'
 import { createSpy } from '../../tests/unit/helpers/spy.js'
 import { expectError } from '../../tests/unit/helpers/expect_error.js'
 import {
@@ -35,7 +35,7 @@ test.group('AppointmentsService', (group) => {
     const createValidator = createSpy(async () => appointmentPayload())
     const updateValidator = createSpy(async (payload: Record<string, unknown>) => payload)
     service = new AppointmentsService({
-      model,
+      model: asLucidModel(model),
       patientModel,
       professionalModel,
       examModel,
@@ -130,7 +130,7 @@ test.group('AppointmentsService', (group) => {
       appointmentPayload({ professional_id: 'professional-2' })
     )
     service = new AppointmentsService({
-      model,
+      model: asLucidModel(model),
       patientModel,
       professionalModel,
       examModel,

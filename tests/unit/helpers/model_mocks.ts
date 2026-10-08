@@ -1,6 +1,7 @@
 import { createQueryBuilderMock, QueryBuilderMock } from './mock_query_builder.js'
 import { createRecordMock, RecordMock } from './mock_record.js'
 import { createSpy, SpyFn } from './spy.js'
+import type { LucidModel } from '@adonisjs/lucid/types/model'
 
 export type ModelMockOptions = {
   /** Builder base retornado por `model.query()` */
@@ -41,6 +42,10 @@ export type ModelMock = ReturnType<typeof createModelMock>
 /** Acessa um spy estático do model, tipado. */
 export function modelSpy<T extends keyof ModelMock>(model: ModelMock, method: T): SpyFn {
   return model[method] as SpyFn
+}
+
+export function asLucidModel(model: ModelMock): LucidModel {
+  return model as unknown as LucidModel
 }
 
 /** Define o builder retornado pelo `model.query()` e devolve o model para encadeamento. */

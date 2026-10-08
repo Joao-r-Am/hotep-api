@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 import ProfessionalsService from './professionals-services.js'
 import { createQueryBuilderMock } from '../../tests/unit/helpers/mock_query_builder.js'
 import { createRecordMock } from '../../tests/unit/helpers/mock_record.js'
-import { createModelMock } from '../../tests/unit/helpers/model_mocks.js'
+import { createModelMock, asLucidModel } from '../../tests/unit/helpers/model_mocks.js'
 import { createSpy } from '../../tests/unit/helpers/spy.js'
 import { expectError } from '../../tests/unit/helpers/expect_error.js'
 import {
@@ -65,9 +65,9 @@ test.group('ProfessionalsService', (group) => {
     const createValidator = createSpy(async () => professionalPayload())
     const updateValidator = createSpy(async (payload: Record<string, unknown>) => payload)
     service = new ProfessionalsService({
-      model: professionalModel,
-      examModel,
-      procedureModel,
+      model: asLucidModel(professionalModel),
+      examModel: asLucidModel(examModel),
+      procedureModel: asLucidModel(procedureModel),
       createValidator: { validate: createValidator },
       updateValidator: { validate: updateValidator },
       attachExamValidator: { validate: attachExamValidator },

@@ -1,36 +1,23 @@
 import { DateTime } from 'luxon'
-
-export type CompiledValidator = {
-  validate(data: Record<string, unknown>): Promise<any>
-}
-
-export type UniqueField = {
-  field: string
-  message: string
-}
-
-export type CrudListOptions = {
-  page: number
-  limit: number
-  preloads: string[]
-  request?: any
-}
-
-export type CrudResourceConfig = {
-  model: any
-  notFoundMessage: string
-  orderBy?: string
-  softDeleteColumn?: string
-  defaultReadPreloads?: string[]
-  createValidator?: CompiledValidator
-  updateValidator?: CompiledValidator
-  uniqueFields?: UniqueField[]
-}
+import type {
+  LucidModel,
+  LucidRow,
+  ModelObject,
+  ModelQueryBuilderContract,
+} from '@adonisjs/lucid/types/model'
+import type { StrictValues } from '@adonisjs/lucid/types/querybuilder'
+import {
+  CompiledValidator,
+  CrudListOptions,
+  CrudListResult,
+  CrudResourceConfig,
+  CrudServiceError,
+} from '../interfaces/base-crud.interface.js'
 
 export default class BaseCrudService {
   constructor(protected readonly config: CrudResourceConfig) {}
 
-  async create(payload: Record<string, unknown>) {
+  async create(payload: Record<string, unknown>): Promise<ModelObject> {
     const validated = await this.validatePayload(this.config.createValidator, payload)
     await this.ensureUniqueFields(validated)
 
@@ -38,29 +25,29 @@ export default class BaseCrudService {
     return record.serialize()
   }
 
-  async read(id: string, requestedPreloads: string[] = []) {
+  async read(id: string, requestedPreloads: string[] = []): Promise<ModelObject> {
     const defaultPreloads = this.config.defaultReadPreloads ?? []
     const record = await this.findByIdOrFail(id, [...defaultPreloads, ...requestedPreloads])
 
     return record.serialize()
   }
 
-  async list({ page, limit, preloads }: CrudListOptions) {
+  async list({ page, limit, preloads }: CrudListOptions): Promise<CrudListResult> {
     const query = this.buildBaseQuery().orderBy(this.config.orderBy ?? 'created_at', 'desc')
 
     for (const preload of preloads) {
-      query.preload(preload)
+      query.preload(preload as never)
     }
 
     const paginator = await query.paginate(page, limit)
 
     return {
-      data: paginator.all().map((record: any) => record.serialize()),
+      data: paginator.all().map((record) => record.serialize()),
       meta: paginator.getMeta(),
     }
   }
 
-  async update(id: string, payload: Record<string, unknown>) {
+  async update(id: string, payload: Record<string, unknown>): Promise<ModelObject> {
     const record = await this.findByIdOrFail(id)
     const validated = await this.validatePayload(this.config.updateValidator, payload)
 
@@ -72,7 +59,7 @@ export default class BaseCrudService {
     return record.serialize()
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<boolean> {
     const record = await this.findByIdOrFail(id)
 
     if (this.config.softDeleteColumn) {
@@ -85,8 +72,8 @@ export default class BaseCrudService {
     return true
   }
 
-  protected buildBaseQuery() {
-    const query: any = this.config.model.query()
+  protected buildBaseQuery(): ModelQueryBuilderContract<LucidModel, LucidRow> {
+    const query = this.config.model.query()
 
     if (this.config.softDeleteColumn) {
       query.whereNull(this.config.softDeleteColumn)
@@ -95,17 +82,17 @@ export default class BaseCrudService {
     return query
   }
 
-  protected async findByIdOrFail(id: string, preloads: string[] = []) {
-    const query: any = this.buildBaseQuery().where('id', id)
+  protected async findByIdOrFail(id: string, preloads: string[] = []): Promise<LucidRow> {
+    const query = this.buildBaseQuery().where('id', id)
 
     for (const preload of [...new Set(preloads)]) {
-      query.preload(preload)
+      query.preload(preload as never)
     }
 
-    const record: any = await query.first()
+    const record = await query.first()
 
     if (!record) {
-      throw { message: this.config.notFoundMessage, status: 404 }
+      throw { message: this.config.notFoundMessage, status: 404 } satisfies CrudServiceError
     }
 
     return record
@@ -114,7 +101,7 @@ export default class BaseCrudService {
   private async validatePayload(
     validator: CompiledValidator | undefined,
     payload: Record<string, unknown>
-  ) {
+  ): Promise<Record<string, unknown>> {
     if (!validator) {
       return payload
     }
@@ -130,7 +117,7 @@ export default class BaseCrudService {
         continue
       }
 
-      const query: any = this.config.model.query().where(uniqueField.field, value as any)
+      const query = this.config.model.query().where(uniqueField.field, value as StrictValues)
 
       if (this.config.softDeleteColumn) {
         query.whereNull(this.config.softDeleteColumn)
@@ -143,7 +130,7 @@ export default class BaseCrudService {
       const existing = await query.first()
 
       if (existing) {
-        throw { message: uniqueField.message, status: 409 }
+        throw { message: uniqueField.message, status: 409 } satisfies CrudServiceError
       }
     }
   }
