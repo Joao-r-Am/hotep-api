@@ -43,6 +43,10 @@ dist-ssr
 coverage
 *.local
 
+docs
+plans
+PLANO-REFATORACAO-ACESSO-MULTITENANT.md
+
 scripts
 
 /cypress/videos/
