@@ -35,7 +35,7 @@ export default class SchedulingInvitesService {
    * Cria um convite validando as referências informadas e devolve
    * `{ id, token, url, expires_at }`.
    */
-  async create(clinic_id: string, createdBy: string, payload: CreateInvitePayload) {
+  async create(clinic_id: string, created_by: string, payload: CreateInvitePayload) {
     const expiresInDays = payload.expires_in_days ?? DEFAULT_EXPIRES_IN_DAYS;
 
     await this.assertReferencesExist(payload);
@@ -49,7 +49,7 @@ export default class SchedulingInvitesService {
       procedure_ids: payload.procedure_ids ?? null,
       exam_ids: payload.exam_ids ?? null,
       expires_at: DateTime.now().plus({ days: expiresInDays }),
-      created_by: createdBy,
+      created_by: created_by,
     });
 
     return {
