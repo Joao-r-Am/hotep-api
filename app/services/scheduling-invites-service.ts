@@ -35,7 +35,7 @@ export default class SchedulingInvitesService {
    * Cria um convite validando as referências informadas e devolve
    * `{ id, token, url, expires_at }`.
    */
-  async create(clinicId: string, createdBy: string, payload: CreateInvitePayload) {
+  async create(clinic_id: string, createdBy: string, payload: CreateInvitePayload) {
     const expiresInDays = payload.expires_in_days ?? DEFAULT_EXPIRES_IN_DAYS;
 
     await this.assertReferencesExist(payload);
@@ -43,7 +43,7 @@ export default class SchedulingInvitesService {
     const token = generateSchedulingToken();
     const invite = await this.inviteModel.create({
       token,
-      clinic_id: clinicId,
+      clinic_id: clinic_id,
       patient_id: payload.patient_id ?? null,
       professional_id: payload.professional_id ?? null,
       procedure_ids: payload.procedure_ids ?? null,
@@ -64,8 +64,8 @@ export default class SchedulingInvitesService {
    * Lista os convites da clínica com o status calculado
    * (`pending | used | expired | revoked`).
    */
-  async list(clinicId: string): Promise<{ data: InviteListItem[] }> {
-    const invites = await this.inviteModel.query().where('clinic_id', clinicId).orderBy('created_at', 'desc');
+  async list(clinic_id: string): Promise<{ data: InviteListItem[] }> {
+    const invites = await this.inviteModel.query().where('clinic_id', clinic_id).orderBy('created_at', 'desc');
 
     const now = DateTime.now();
     const data: InviteListItem[] = invites.map((invite: any) => {
@@ -92,8 +92,8 @@ export default class SchedulingInvitesService {
   /**
    * Revoga um convite (soft delete + expiração imediata).
    */
-  async revoke(id: string, clinicId: string): Promise<{ revoked: boolean }> {
-    const invite = await this.inviteModel.query().where('id', id).where('clinic_id', clinicId).whereNull('deleted_at').first();
+  async revoke(id: string, clinic_id: string): Promise<{ revoked: boolean }> {
+    const invite = await this.inviteModel.query().where('id', id).where('clinic_id', clinic_id).whereNull('deleted_at').first();
 
     if (!invite) {
       throw new ApiException(404, 'INVITE_NOT_FOUND', 'Convite não encontrado.', {});
