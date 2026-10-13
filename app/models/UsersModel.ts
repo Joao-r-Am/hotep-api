@@ -1,23 +1,17 @@
 import { DateTime } from 'luxon';
 import hash from '@adonisjs/core/services/hash';
 import { compose } from '@adonisjs/core/helpers';
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm';
+import { BaseModel, column } from '@adonisjs/lucid/orm';
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid';
 import type { UUID } from 'crypto';
 import { AccessType, EspecialtyArea, IUser } from '../interfaces/users.inteface.js';
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
-  uids: ['email', 'cnpjf'],
+  uids: ['cnpjf'],
   passwordColumnName: 'password',
 });
 
 export default class User extends compose(BaseModel, AuthFinder) implements IUser {
-  @beforeCreate()
-  static async hashPassword(user: any) {
-    if (user.password) {
-      user.password = await hash.use('scrypt').make(user.password);
-    }
-  }
   @column({ isPrimary: true })
   declare id: UUID;
 
