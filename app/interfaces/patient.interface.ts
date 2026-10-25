@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 
 export interface IPatient {
   id: UUID
+  clinic_id?: UUID
   name: string
   document: string
   birth_date?: DateTime

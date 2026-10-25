@@ -4,6 +4,7 @@ import type { LucidModel } from '@adonisjs/lucid/types/model'
 
 export interface IProfessional {
   id: string
+  clinic_id?: string
   name: string
   document: string
   birth_date?: DateTime

@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 
 export interface IProcedure {
   id: string
+  clinic_id?: string
   name: string
   description?: string
   duration_minutes?: number
