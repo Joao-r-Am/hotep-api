@@ -113,8 +113,8 @@ export default class SchedulingInvitesService {
   }
 
   private buildUrl(token: string): string {
-    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:9000';
-    return `${frontendUrl}/#/to-schedule/${token}`;
+    const frontend_url = process.env.FRONTEND_URL;
+    return `${frontend_url}/#/to-schedule/${token}`;
   }
 
   private async assertReferencesExist(payload: CreateInvitePayload) {
