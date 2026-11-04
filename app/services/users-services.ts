@@ -1,5 +1,5 @@
 import User from '#models/UsersModel';
-import { AccessType, IUser } from '../interfaces/users.inteface.js';
+import { AccessType, EspecialtyArea, IUser } from '../interfaces/users.inteface.js';
 import { registerValidator } from '#validators/auth';
 import emailsQueue from '../queues/auth/emails.queue.js';
 import Code from '#models/CodesModel';
@@ -50,36 +50,53 @@ export default class AuthService {
       throw { message: 'ERROR.INVALID_CNPJF', status: 400 };
     }
 
+    user.cnpjf = user.cnpjf.replace(/\D/g, '');
+
     const validate = await this.registerValidator!.validate(user);
     user.access_type = AccessType.BASIC;
     let username = '';
-    const find_user = await this.userModel
-      .query()
-      .from('users')
-      .select('id')
-      .whereILike('username', `${user.name.toLocaleLowerCase()}.${user.lastname.toLocaleLowerCase()}`);
-    if (find_user.length) {
-      const code = Math.random() * 1000;
-      username = `${user.name.toLocaleLowerCase()}.${user.lastname.toLocaleLowerCase()}${code}`;
-    } else {
-      username = `${user.name.toLocaleLowerCase()}.${user.lastname.toLocaleLowerCase()}`;
+    if (user.especialty_area !== EspecialtyArea.CLINIC) {
+      const find_user = await this.userModel
+        .query()
+        .from('users')
+        .select('id')
+        .whereILike('username', `${user.name.toLocaleLowerCase()}.${user?.lastname?.toLocaleLowerCase()}`);
+      if (find_user.length) {
+        const code = Math.random() * 1000;
+        username = `${user.name.toLocaleLowerCase()}.${user.lastname.toLocaleLowerCase()}${code}`;
+      } else {
+        username = `${user.name.toLocaleLowerCase()}.${user.lastname.toLocaleLowerCase()}`;
+      }
     }
 
     const created_user = await this.userModel.create({ ...validate, active: true, username });
 
-    created_user.password = undefined!;
+    // created_user.password = undefined!;
     const code = await this.generateCode(created_user.id);
     await this.emailsQueue!.addJobs({
       user_data: created_user.$attributes as IUser,
       code: code.code,
     });
 
-    return created_user.$attributes;
+    return {
+      id: created_user.id,
+      name: created_user.name,
+      lastname: created_user?.lastname,
+      email: created_user.email,
+      cnpjf: created_user.cnpjf,
+      phone: created_user.phone,
+      access_type: created_user.access_type,
+      especialty_area: created_user.especialty_area,
+      username: created_user?.username,
+      active: created_user.active,
+    };
   }
 
   async login(auth: { identificator: string; password: string }) {
     const { identificator, password } = auth;
-    const user = await this.userModel.verifyCredentials(identificator, password);
+    const _identificator = identificator.match(/\d/g)?.join('') || identificator;
+
+    const user = await this.userModel.verifyCredentials(_identificator, password);
     if (!user.active) {
       throw { message: 'ERROR.EMAIL_NOT_CONFIRMED', status: 403 };
     }

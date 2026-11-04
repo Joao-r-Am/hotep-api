@@ -7,7 +7,7 @@ import { createSpy } from '../../tests/unit/helpers/spy.js';
 import { expectError } from '../../tests/unit/helpers/expect_error.js';
 import { makeUser, registerPayload } from '../../tests/unit/fixtures/users.js';
 import { makeCode, expiredCode, codeAttributes } from '../../tests/unit/fixtures/codes.js';
-import { AccessType } from '../interfaces/users.inteface.js';
+import { AccessType, EspecialtyArea } from '../interfaces/users.inteface.js';
 
 test.group('AuthService', (group) => {
   let userModel: ModelMock;
@@ -48,7 +48,9 @@ test.group('AuthService', (group) => {
     );
     codeModel.create = createSpy(async () => createRecordMock({ attributes: codeAttributes() }));
 
-    const result = await service.register(registerPayload({ lastname: 'Oliveira' }));
+    const result = await service.register(
+      registerPayload({ lastname: 'Oliveira', especialty_area: EspecialtyArea.PSYCHOLOGIST })
+    );
 
     assert.equal(result.username, 'ana.oliveira');
     assert.equal(result.active, true);
@@ -69,9 +71,26 @@ test.group('AuthService', (group) => {
     );
     codeModel.create = createSpy(async () => createRecordMock({ attributes: codeAttributes() }));
 
-    const result = await service.register(registerPayload());
+    const result = await service.register(
+      registerPayload({ especialty_area: EspecialtyArea.PSYCHOLOGIST })
+    );
 
     assert.match(result.username, /^ana\.oliveira\d/);
+  });
+
+  test('register não gera username para conta de clínica', async ({ assert }) => {
+    const userBuilder = createQueryBuilderMock({ result: [] });
+    userModel.query.mockImplementation(() => userBuilder);
+    userModel.create = createSpy(async (payload: Record<string, unknown>) =>
+      createRecordMock({ attributes: { ...payload, id: 'user-1' } }),
+    );
+    codeModel.create = createSpy(async () => createRecordMock({ attributes: codeAttributes() }));
+
+    const result = await service.register(registerPayload());
+
+    assert.equal(result.username, '');
+    const createdPayload = userModel.create.calls[0].args[0] as Record<string, unknown>;
+    assert.equal(createdPayload.username, '');
   });
 
   test('register valida o payload antes de criar o usuário', async ({ assert }) => {

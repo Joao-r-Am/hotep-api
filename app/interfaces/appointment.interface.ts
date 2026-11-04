@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 
 export interface IAppointment {
   id: string
+  clinic_id?: string
   patient_id: string
   professional_id: string
   exam_id?: string | null

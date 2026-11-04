@@ -11,6 +11,6 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    this.schema.dropTable(this.tableName)
+    this.schema.raw(`ALTER TABLE users DROP COLUMN IF EXISTS username;`)
   }
 }
