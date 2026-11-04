@@ -33,6 +33,9 @@ export default class Professional extends BaseModel implements IProfessional {
   @column()
   declare email: string | undefined
 
+  @column()
+  declare membership_id: UUID | null
+
   @column.dateTime({ autoCreate: true })
   declare created_at: DateTime
 
