@@ -4,6 +4,7 @@ import type { NextFn } from '@adonisjs/core/types/http';
 import Ujwt from '../utils/jwt.js';
 import User from '#models/UsersModel';
 import logger from '@adonisjs/core/services/logger';
+import type { IAuthPayload } from '../types/auth.js';
 
 export default class AuthMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -83,6 +84,7 @@ export default class AuthMiddleware {
           especialty_area: user.especialty_area,
           access_type: user.access_type,
         },
+        payload: decoded as IAuthPayload,
         is_authenticated: true,
       };
 
