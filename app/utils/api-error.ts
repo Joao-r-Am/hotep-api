@@ -43,6 +43,16 @@ export function sendErrorResponse(ctx: HttpContext, error: unknown) {
     })
   }
 
+  // Erros de validação (VineJS): 422 com as mensagens por campo.
+  if (error instanceof Error && 'messages' in error) {
+    logger.debug({ err: error, path: requestPath }, 'error.validation')
+    return toHttpResponse(responseCtx, 422, {
+      code: 'VALIDATION_ERROR',
+      message: 'Dados inválidos.',
+      details: { messages: (error as unknown as { messages: unknown }).messages },
+    })
+  }
+
   logger.error({ err: error, path: requestPath }, 'error.unhandled')
 
   return toHttpResponse(responseCtx, 500, {
