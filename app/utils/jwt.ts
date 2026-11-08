@@ -4,7 +4,21 @@ import { AccessType, EspecialtyArea, IUser } from '../interfaces/users.inteface.
 const SECRET = process.env.JWT_SECRET as string
 const EXPIRES_IN = '7d'
 
-const generateToken = (user: IUser) => {
+/**
+ * Contexto de clínica ativa embutido no token.
+ *
+ * Emitido apenas pela seleção de clínica (`POST /auth/select-clinic`);
+ * nunca deve ser aceito do corpo da requisição como autorização.
+ */
+export interface ITokenClinicContext {
+  clinic_id: string
+  membership_id: string
+}
+
+const generateToken = (
+  user: Pick<IUser, 'id' | 'email' | 'name' | 'cnpjf' | 'especialty_area' | 'access_type'>,
+  clinicContext?: ITokenClinicContext
+) => {
   const payload: {
     name: string
     user_id: string
@@ -12,6 +26,8 @@ const generateToken = (user: IUser) => {
     cnpjf: string
     especialty_area: EspecialtyArea
     access_type: AccessType
+    clinic_id?: string
+    membership_id?: string
   } = {
     email: user.email,
     user_id: user.id,
@@ -19,6 +35,11 @@ const generateToken = (user: IUser) => {
     cnpjf: user.cnpjf,
     especialty_area: user.especialty_area,
     access_type: user.access_type,
+  }
+
+  if (clinicContext) {
+    payload.clinic_id = clinicContext.clinic_id
+    payload.membership_id = clinicContext.membership_id
   }
 
   return jwt.sign(payload, SECRET as string, {

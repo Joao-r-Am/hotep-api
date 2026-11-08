@@ -40,4 +40,5 @@ router.use([() => import('@adonisjs/core/bodyparser_middleware'), () => import('
  */
 export const middleware = router.named({
   validateSchedulingToken: () => import('#middleware/scheduling_token_middleware'),
+  accessContext: () => import('#middleware/access_context_middleware'),
 });

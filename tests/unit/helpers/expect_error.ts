@@ -3,6 +3,7 @@ import type { Assert } from '@japa/assert'
 export type ExpectedError = {
   status?: number
   message?: string
+  code?: string
 }
 
 /**
@@ -31,5 +32,8 @@ export async function expectError(
   }
   if (expected.message !== undefined) {
     assert.equal(error.message, expected.message)
+  }
+  if (expected.code !== undefined) {
+    assert.equal(error.code, expected.code)
   }
 }

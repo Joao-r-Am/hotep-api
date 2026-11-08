@@ -20,6 +20,7 @@ export type QueryBuilderMockOptions = {
 export function createQueryBuilderMock(options: QueryBuilderMockOptions = {}) {
   const builder = {
     where: createSpy(() => builder),
+    whereIn: createSpy(() => builder),
     whereNull: createSpy(() => builder),
     whereNot: createSpy(() => builder),
     whereILike: createSpy(() => builder),
@@ -34,6 +35,8 @@ export function createQueryBuilderMock(options: QueryBuilderMockOptions = {}) {
     paginate: createSpy(
       async () => options.paginateResult ?? { all: () => [], getMeta: () => ({}) }
     ),
+    update: createSpy(async () => 1),
+    delete: createSpy(async () => 1),
     first: createSpy(async () => {
       if ('firstResult' in options) {
         return options.firstResult
