@@ -10,6 +10,7 @@ export enum MembershipStatus {
 export interface IClinic {
   id: UUID
   name: string
+  email?: string | null
   cnpjf?: string | null
   phone?: string | null
   site_page?: string | null

@@ -13,6 +13,9 @@ export default class Clinic extends BaseModel implements IClinic {
   declare name: string
 
   @column()
+  declare email: string | null
+
+  @column()
   declare cnpjf: string | null
 
   @column()
