@@ -251,7 +251,7 @@ export default class ClinicsService {
         { client },
       )) as any;
 
-      await client.table('membership_roles').insert({ membership_id: membershipOwner.id, role_id: ownerRole.id });
+      await client.insertQuery().table('membership_roles').insert({ membership_id: membershipOwner.id, role_id: ownerRole.id });
 
       addressRecord = await this.addressService.setFor('clinics', created_clinic.id, address ?? null, { client });
 
@@ -334,7 +334,7 @@ export default class ClinicsService {
         { client },
       )) as any;
 
-      await client.table('membership_roles').insert({ membership_id: linkedMembership.id, role_id: operatorRole.id });
+      await client.insertQuery().table('membership_roles').insert({ membership_id: linkedMembership.id, role_id: operatorRole.id });
 
       membership = linkedMembership;
     });

@@ -1,20 +1,22 @@
-import { createQueryBuilderMock, QueryBuilderMock } from './mock_query_builder.js'
-import { createRecordMock, RecordMock } from './mock_record.js'
-import { createSpy, SpyFn } from './spy.js'
-import type { LucidModel } from '@adonisjs/lucid/types/model'
+import { createQueryBuilderMock, QueryBuilderMock } from './mock_query_builder.js';
+import { createRecordMock, RecordMock } from './mock_record.js';
+import { createSpy, SpyFn } from './spy.js';
+import type { LucidModel } from '@adonisjs/lucid/types/model';
 
 export type ModelMockOptions = {
   /** Builder base retornado por `model.query()` */
-  builder?: QueryBuilderMock
+  builder?: QueryBuilderMock;
   /** Registro retornado por `model.create()` */
-  createdRecord?: RecordMock
+  createdRecord?: RecordMock;
   /** Valor retornado por `model.find()` */
-  findResult?: any
+  findResult?: any;
   /** Valor retornado por `model.findBy()` */
-  findByResult?: any
+  findByResult?: any;
   /** Valor retornado por `model.verifyCredentials()` */
-  credentialsResult?: any
-}
+  credentialsResult?: any;
+  /** Registro retornado por `model.insert()` */
+  insert?: RecordMock;
+};
 
 /**
  * Mock de um model Lucid (lado estático).
@@ -25,31 +27,29 @@ export type ModelMockOptions = {
 export function createModelMock(options: ModelMockOptions = {}) {
   const model = {
     query: createSpy(() => options.builder ?? createQueryBuilderMock()),
-    create: createSpy(
-      async (payload: Record<string, unknown>) =>
-        options.createdRecord ?? createRecordMock({ attributes: payload })
-    ),
+    create: createSpy(async (payload: Record<string, unknown>) => options.createdRecord ?? createRecordMock({ attributes: payload })),
+    insert: createSpy(async (payload: Record<string, unknown>) => options.insert ?? createRecordMock({ attributes: payload })),
     find: createSpy(async (_id: string | number) => options.findResult ?? null),
     findBy: createSpy(async () => options.findByResult ?? null),
     verifyCredentials: createSpy(async () => options.credentialsResult ?? null),
-  }
+  };
 
-  return model
+  return model;
 }
 
-export type ModelMock = ReturnType<typeof createModelMock>
+export type ModelMock = ReturnType<typeof createModelMock>;
 
 /** Acessa um spy estático do model, tipado. */
 export function modelSpy<T extends keyof ModelMock>(model: ModelMock, method: T): SpyFn {
-  return model[method] as SpyFn
+  return model[method] as SpyFn;
 }
 
 export function asLucidModel(model: ModelMock): LucidModel {
-  return model as unknown as LucidModel
+  return model as unknown as LucidModel;
 }
 
 /** Define o builder retornado pelo `model.query()` e devolve o model para encadeamento. */
 export function withBuilder(model: ModelMock, builder: QueryBuilderMock) {
-  modelSpy(model, 'query').mockImplementation(() => builder)
-  return model
+  modelSpy(model, 'query').mockImplementation(() => builder);
+  return model;
 }
